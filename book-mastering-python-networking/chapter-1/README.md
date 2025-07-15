@@ -128,6 +128,14 @@ print(b)        # {1, 2, 3, 4, 5}
 
 b.update(['a', 'a', 'b', 'b'])
 print(b)        # {1, 2, 3, 4, 5, 'b', 'a'}
+
+a = set([1, 2, 3, 4, 5])
+b = set([4, 5, 6, 7, 8])
+
+print(a.intersection(b))    #output: {4, 5}
+
+print(a.union(b))           #output: {1, 2, 3, 4, 5, 6, 7, 8}
+
 ```
 
 ---
