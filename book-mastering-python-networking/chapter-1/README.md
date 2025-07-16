@@ -128,25 +128,147 @@ print(b)        # {1, 2, 3, 4, 5}
 
 b.update(['a', 'a', 'b', 'b'])
 print(b)        # {1, 2, 3, 4, 5, 'b', 'a'}
+```
 
-a = set([1, 2, 3, 4, 5])
-b = set([4, 5, 6, 7, 8])
 
-print(a.intersection(b))    #output: {4, 5}
+---
 
-print(a.union(b))           #output: {1, 2, 3, 4, 5, 6, 7, 8}
+## ➕ Python Operators
 
+```python
+print(1 + 3)    # 4
+print(2 - 1)    # 1
+print(1 * 5)    # 5
+
+# Floor division and modulo
+print(5 / 1)    # 5.0
+print(5 // 2)   # 2
+print(5 % 2)    # 1
+```
+
+> 📝 Note: 
+> - `//` (floor division) truncates the result to an integer.
+> - `%` (modulo) returns the remainder.
+
+---
+
+## 🔍 Comparison and Membership Operators
+
+```python
+a = 1
+b = 2
+
+print(a == b)   # False
+print(a > b)    # False
+print(a < b)    # True
+print(a <= b)   # True
+
+a = 'hello world'
+
+print('h' in a)     # True
+print('z' in a)     # False
+print('h' not in a) # False
+print('z' not in a) # True
 ```
 
 ---
 
-## ✅ Summary
+## 🔁 Conditional Statements
 
-This repository includes:
+```python
+a = 10
 
-- ✅ Python fundamentals
-- ✅ Data structures: Lists, Tuples, Dictionaries, Sets
-- ✅ Built-in functions and methods
+if a > 1:
+    print(str(a) + ' is larger than 1')
+elif a < 1:
+    print(str(a) + ' is smaller than 1')
+else:
+    print(str(a) + ' is equal to 1')
+```
 
 ---
 
+## 🔄 While Loop
+
+```python
+a = 10 
+b = 1
+
+while b < 10:
+    print(b)
+    b += 1
+```
+
+---
+
+## 🔂 For Loop
+
+```python
+a = [100, 200, 300, 400, 500]
+
+for numbers in a:
+    print(numbers)
+```
+
+---
+
+## 🧩 Python Functions
+
+```python
+def subtract(a, b):
+    c = a - b
+    return c
+
+result = subtract(10, 5)
+print(result)   # 5
+```
+
+---
+
+## 🧱 Python Classes
+
+```python
+class router(object):
+    def __init__(self, name, interface_number, vendor):
+        self.name = name
+        self.interface_number = interface_number
+        self.vendor = vendor
+
+r1 = router('CSR100V', 64, 'Cisco')
+print(r1.name)              # CSR100V
+print(r1.interface_number)  # 64
+print(r1.vendor)            # Cisco
+```
+
+---
+
+## 📦 Modules and Packages
+
+```python
+# File: subtract.py
+def subtract(a, b):
+    return a - b
+```
+
+To import and use in another script in the same directory:
+
+```python
+import subtract
+result = subtract.subtract(10, 5)
+print(result)   # 5
+```
+
+To create a package:
+
+```bash
+mkdir math_stuff
+touch math_stuff/__init__.py
+```
+
+Place `subtract.py` inside `math_stuff`, then use:
+
+```python
+from math_stuff.subtract import subtract
+result = subtract(10, 5)
+print(result)   # 5
+```
