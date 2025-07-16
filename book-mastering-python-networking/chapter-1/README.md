@@ -150,6 +150,12 @@ print(5 % 2)    # 1
 > - `//` (floor division) truncates the result to an integer.
 > - `%` (modulo) returns the remainder.
 
+> Example:
+> - example:
+
+5 // 2 the result is 2 because the result of the division is 3.5
+
+5 % 2 the result is 1 because 5 divided by 2 is 2 with remainder(restante) 1
 ---
 
 ## 🔍 Comparison and Membership Operators
