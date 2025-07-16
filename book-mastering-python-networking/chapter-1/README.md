@@ -152,7 +152,7 @@ print(5 % 2)    # 1
 
 > Example:
 > - examples:
-> - 5 // 2 the result is 2 because the result of the division is 3.5
+> - 5 // 2 the result is 2 because the result of the division is 2.5
 > - 5 % 2 the result is 1 because 5 divided by 2 is 2 with remainder(restante) 1
 ---
 
