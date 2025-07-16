@@ -151,11 +151,9 @@ print(5 % 2)    # 1
 > - `%` (modulo) returns the remainder.
 
 > Example:
-> - example:
-
-5 // 2 the result is 2 because the result of the division is 3.5
-
-5 % 2 the result is 1 because 5 divided by 2 is 2 with remainder(restante) 1
+> - examples:
+> - 5 // 2 the result is 2 because the result of the division is 3.5
+> - 5 % 2 the result is 1 because 5 divided by 2 is 2 with remainder(restante) 1
 ---
 
 ## 🔍 Comparison and Membership Operators
