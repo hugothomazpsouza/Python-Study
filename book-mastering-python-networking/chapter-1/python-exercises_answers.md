@@ -263,3 +263,48 @@ for device in connection:
 #[Firewall] FW1 (10.0.1.1) is Reachable ✅
 #[Switch] SW2 (10.0.0.2) is Unreachable ❌
 ```
+
+```python
+class NetworkDevices:
+    def __init__(self, hostname, ip_address, device_type, uptime_days):
+        self.hostname = hostname
+        self.ip_address = ip_address
+        self.device_type = device_type
+        self.uptime_days = uptime_days
+        
+    def uptime_report(self):
+        # Check uptime condition and print accordingly
+        if self.uptime_days > 365:
+            print(f"⚠️ WARNING: Please, restart the {self.hostname} ({self.ip_address}) because it has more than 365 days running.")
+        else:
+            print(f"✅ Hostname: {self.hostname} - IP: {self.ip_address} - Device: {self.device_type} - Uptime: {self.uptime_days} days.")
+        print('---')  # Separator for readability
+
+    
+
+# List of device dictionaries
+connection_devices = [
+    {"hostname": "RT1", "ip_address": "10.0.0.254", "device_type": "Router", "uptime_days": 2000},
+    {"hostname": "SW1", "ip_address": "10.0.0.1", "device_type": "Switch", "uptime_days": 200},
+    {"hostname": "FW1", "ip_address": "10.0.1.1", "device_type": "Firewall", "uptime_days": 250},
+    {"hostname": "SW2", "ip_address": "10.0.0.2", "device_type": "Switch", "uptime_days": 500},
+]
+
+uptime = [NetworkDevices(**devices) for devices in connection_devices]
+
+
+for device in uptime:
+    device.uptime_report()    
+
+
+#Output:
+⚠️ WARNING: Please, restart the RT1 (10.0.0.254) because it has more than 365 days running.
+---
+✅ Hostname: SW1 - IP: 10.0.0.1 - Device: Switch - Uptime: 200 days.
+---
+✅ Hostname: FW1 - IP: 10.0.1.1 - Device: Firewall - Uptime: 250 days.
+---
+⚠️ WARNING: Please, restart the SW2 (10.0.0.2) because it has more than 365 days running.
+---
+
+```
