@@ -319,12 +319,14 @@ This project demonstrates how to organize Python code using **modules and packag
 ---
 
 ## 🗂️ Project Structure
-
+```
 .
 ├── check_private_ip_address.py
 └── tools
     ├── __init__.py
     └── is_private_ip.py
+```
+
 
 
 - `tools/`: A package containing reusable network utility functions.
