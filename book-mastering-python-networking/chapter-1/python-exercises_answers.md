@@ -298,13 +298,13 @@ for device in uptime:
 
 
 #Output:
-⚠️ WARNING: Please, restart the RT1 (10.0.0.254) because it has more than 365 days running.
----
-✅ Hostname: SW1 - IP: 10.0.0.1 - Device: Switch - Uptime: 200 days.
----
-✅ Hostname: FW1 - IP: 10.0.1.1 - Device: Firewall - Uptime: 250 days.
----
-⚠️ WARNING: Please, restart the SW2 (10.0.0.2) because it has more than 365 days running.
----
+#⚠️ WARNING: Please, restart the RT1 (10.0.0.254) because it has more than 365 days running.
+#---
+#✅ Hostname: SW1 - IP: 10.0.0.1 - Device: Switch - Uptime: 200 days.
+#---
+#✅ Hostname: FW1 - IP: 10.0.1.1 - Device: Firewall - Uptime: 250 days.
+#---
+#⚠️ WARNING: Please, restart the SW2 (10.0.0.2) because it has more than 365 days running.
+#---
 
 ```
