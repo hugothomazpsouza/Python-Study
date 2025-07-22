@@ -308,3 +308,88 @@ for device in uptime:
 #---
 
 ```
+
+
+## 16. Modules and Packages
+
+# 📦 Check Private IP Addresses
+
+This project demonstrates how to organize Python code using **modules and packages**. It includes a function that checks whether an IP address belongs to a **private IP range** using Python's built-in `ipaddress` module.
+
+---
+
+## 🗂️ Project Structure
+
+.
+├── check_private_ip_address.py
+└── tools
+    ├── __init__.py
+    └── is_private_ip.py
+
+
+- `tools/`: A package containing reusable network utility functions.
+- `tools/is_private_ip.py`: Contains the `is_private_ip()` function.
+- `tools/__init__.py` 👉 Note: In order for Python to recognize the directory as a package, you must create an empty __init__.py file inside it.
+- `check_private_ip_address.py`: Script to test the function with different IP addresses.
+
+---
+
+## 🔧 Function Description
+
+The `is_private_ip(ip_address)` function checks if an IP address falls within one of the following **private ranges** (as defined in [RFC 1918](https://datatracker.ietf.org/doc/html/rfc1918)):
+
+- `10.0.0.0/8` – From `10.0.0.0` to `10.255.255.255`
+- `172.16.0.0/12` – From `172.16.0.0` to `172.31.255.255`
+- `192.168.0.0/16` – From `192.168.0.0` to `192.168.255.255`
+
+The function returns:
+- `True` → If the IP is private  
+- `False` → If the IP is public, loopback, link-local, or invalid
+
+---
+
+## 🧪 Example Test Script
+
+File: `is_private_ip.py`
+
+```python
+import ipaddress
+
+def is_private_ip(ip_address):
+    """ 
+    Returns True if the IP address is from a private range, else False. 
+
+    Example of private ranges: - 10.0.0.0/8 - 172.16.0.0/12 - 192.168.0.0/16 
+    """
+    try:
+        ip = ipaddress.ip_address(ip_address)
+        return ip.is_private
+    except ValueError:
+        return False
+```
+
+
+File: `check_private_ip_address.py`
+
+```python
+from tools.is_private_ip import is_private_ip
+
+ip_list = [
+    "10.0.0.1",         # Private
+    "172.16.5.4",       # Private
+    "192.168.1.100",    # Private
+    "8.8.8.8",          # Public (Google DNS)
+    "1.1.1.1",          # Public (Cloudflare DNS)
+    "172.32.0.1",       # Public (outside private 172.16.0.0/12)
+    "192.0.2.1",        # Public (TEST-NET-1)
+    "169.254.1.1",      # Link-local
+    "127.0.0.1",        # Loopback
+    "100.64.0.1"        # CG-NAT (special-use)
+]
+
+for ip in ip_list:
+    if is_private_ip(ip):
+        print(f"The {ip} is a Private IP address.")
+    else:
+        print(f"The {ip} is NOT a Private IP address.")
+
