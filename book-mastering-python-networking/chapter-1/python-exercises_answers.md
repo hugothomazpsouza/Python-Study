@@ -207,3 +207,38 @@ fw1 = firewall(
 
 fw1.print_info()
 ```
+
+## Other classe example (adictional)
+
+```python
+class networkdevices:
+    def __init__(self, hostname, ip_address, device_type, reachable):
+        self.hostname = hostname
+        self.ip_address = ip_address
+        self.device_type = device_type
+        self.reachable = reachable
+        
+    def status_report(self):
+        status = "Reachable ✅" if self.reachable else "Unreachable ❌"
+        print(f"[{self.device_type.capitalize()}] {self.hostname.upper()} ({self.ip_address}) is {status}")
+
+connection_devices = [
+    {"hostname": "RT1", "ip_address": "10.0.0.254", "device_type": "Router", "reachable": True},
+    {"hostname": "SW1", "ip_address": "10.0.0.1", "device_type": "Switch", "reachable": False},
+    {"hostname": "FW1", "ip_address": "10.0.1.1", "device_type": "Firewall", "reachable": True},
+    {"hostname": "SW2", "ip_address": "10.0.0.2", "device_type": "Switch", "reachable": False},
+]
+
+
+connection = [networkdevices(**devices) for devices in connection_devices]
+
+for device in connection:
+    device.status_report()
+
+
+#Output:
+#[Router] RT1 (10.0.0.254) is Reachable ✅
+#[Switch] SW1 (10.0.0.1) is Unreachable ❌
+#[Firewall] FW1 (10.0.1.1) is Reachable ✅
+#[Switch] SW2 (10.0.0.2) is Unreachable ❌
+```
