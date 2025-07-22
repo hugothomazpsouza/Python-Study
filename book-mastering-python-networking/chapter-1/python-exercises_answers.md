@@ -184,3 +184,26 @@ duration = 120
 total_data = bandwidth(mbps, duration)
 print(f'Total data transferred in megabytes (MB): {total_data} with a transfer rate of {mbps}mbps in {duration}s.')
 ```
+
+## 15. Classes
+
+```python
+class firewall:
+    def __init__(self, hostname, interfaces, rules):
+        self.hostname   = hostname
+        self.interfaces = interfaces
+        self.rules      = rules
+
+    def print_info(self):
+        print(f'Hostname: {self.hostname}')
+        print(f'Interfaces: {len(self.interfaces)}')
+        print(f'Rules: {len(self.rules)}')
+    
+fw1 = firewall(
+    hostname = 'FW-RJ',
+    interfaces = ['Gig0/0', 'Gig0/1', 'Gig0/2'],
+    rules=["allow tcp from any to any 80", "deny ip from 10.0.0.0/8 to any"]
+)
+
+fw1.print_info()
+```
