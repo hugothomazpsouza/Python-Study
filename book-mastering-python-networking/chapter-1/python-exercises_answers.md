@@ -210,6 +210,24 @@ fw1.print_info()
 
 ## Other classe example (adictional)
 
+What is ** in Python?
+In Python, ** is used to unpack a dictionary into keyword arguments.
+
+# ✅ Summary
+Symbol	Unpacks	Example use
+*	List / tuple	func(*[1, 2, 3])
+**	Dictionary (keys/values)	func(**{"a": 1, "b": 2})
+
+```python
+def add(a, b, c):
+    print(a + b + c)
+
+nums = [1, 2, 3]
+add(*nums)   # same as add(1, 2, 3)
+
+#output: 6
+```
+
 ```python
 class networkdevices:
     def __init__(self, hostname, ip_address, device_type, reachable):
