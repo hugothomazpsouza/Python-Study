@@ -213,10 +213,13 @@ fw1.print_info()
 What is ** in Python?
 In Python, ** is used to unpack a dictionary into keyword arguments.
 
-# ✅ Summary
-Symbol	Unpacks	Example use
-*	List / tuple	func(*[1, 2, 3])
-**	Dictionary (keys/values)	func(**{"a": 1, "b": 2})
+✅ Summary
+### Python Argument Unpacking
+| Symbol | Unpacks              | Example Use                            |
+|--------|----------------------|----------------------------------------|
+| `*`    | List / Tuple         | `func(*[1, 2, 3])`                      |
+| `**`   | Dictionary (keys/values) | `func(**{"a": 1, "b": 2})`          |
+
 
 ```python
 def add(a, b, c):
