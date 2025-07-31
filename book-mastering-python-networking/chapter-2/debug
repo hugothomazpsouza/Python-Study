@@ -1,0 +1,21 @@
+Trying 10.10.20.172...
+Connected to 10.10.20.172.
+Escape character is '^]'.
+
+
+User Access Verification
+
+Username: cisco
+Kerberos: No default realm defined for Kerberos!
+cisco
+Password: cisco
+
+R2>enable
+enable
+Password: cisco
+
+R2#show version | i V
+show version | i V
+Cisco IOS Software [Dublin], Linux Software (X86_64BI_LINUX-ADVENTERPRISEK9-M), Version 17.12.1, RELEASE SOFTWARE (fc5)
+256K bytes of NVRAM.
+R2#exit
