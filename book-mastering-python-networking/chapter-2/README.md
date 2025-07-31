@@ -88,8 +88,8 @@ Sends the string `admin` and presses ENTER.
 
 After calling `child.expect()`, two properties are often useful:
 
-- `child.before`: Contains everything printed **before** the matched pattern.
-- `child.after`: Contains the **matched pattern** itself.
+- `child.before`: Contains everything printed **before** the .expect() match..
+- `child.after`: Contains exactly what was matched by .expect().
 
 ### 💡 Golden Tip:
 
