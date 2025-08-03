@@ -1,0 +1,2 @@
+show ip int brief | in administratively down
+Ethernet0/3            unassigned      YES TFTP   administratively down down    
