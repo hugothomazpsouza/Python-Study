@@ -53,7 +53,7 @@ for device in devices:
 ```
 
 
-- [Exercise 2: Compare Running Configs Across Devices]
+- [Exercise 2: Compare Running Configs Across Devices](#exercise2-compare-running-configs-across-devices)
 
 ```python
 #!/usr/bin/env python
