@@ -292,3 +292,160 @@ max_buffer = 65535
 
 ✅ Summary: Keeps automation clean by ensuring no old output is mixed with new command results.
 
+---
+
+
+# Paramiko Notes and Examples
+
+## Paramiko for Servers
+
+As mentioned in previous notes, Paramiko can be used to connect to Linux servers, Cisco devices, and more.  
+In this example, we’ll connect to an **Ubuntu virtual machine** using **key-based authentication** (private and public key) for an SSHv2 session.
+
+### Generating a Public and Private Key Pair
+On your local machine, run:
+```bash
+ssh-keygen -t rsa
+```
+This generates:
+- **Public key**: `id_rsa.pub` located in `~/.ssh`
+- **Private key**: `id_rsa` located in `~/.ssh`
+
+⚠️ **Important:** Treat your private key like your password—never share it.  
+
+Think of the public key as your *business card* that identifies you.  
+Using these keys:
+- Your message is encrypted locally with your **private key**
+- The remote host decrypts it using your **public key**
+
+### Adding the Public Key to the Remote Host
+From the host where the key pair was created:
+```bash
+cat ~/.ssh/id_rsa.pub
+ssh-rsa <your public key>
+```
+On the remote host:
+```bash
+vim ~/.ssh/authorized_keys
+# Paste your public key here
+```
+
+### Connecting to the Remote Host with Paramiko (Private Key Authentication)
+```python
+import paramiko
+
+key = paramiko.RSAKey.from_private_key_file('/home/echou/.ssh/id_rsa')
+client = paramiko.SSHClient()
+client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+client.connect('192.168.199.182', username='echou', pkey=key)
+
+stdin, stdout, stderr = client.exec_command('ls -l')
+print(stdout.read())
+
+stdin, stdout, stderr = client.exec_command('pwd')
+print(stdout.read())
+
+client.close()
+```
+**Note:**  
+Unlike Cisco routers, which often close idle SSH sessions when using `exec_command()`, LIn a Linux server, we don’t need to create an interactive session (and always open a new connection) to execute multiple commands, as we did for Cisco routers.
+
+**Why Private Key Authentication?**  
+Because more and more network devices are adopting Linux shells with key-based authentication as a secure mechanism.
+
+
+
+## More Paramiko Examples (Reusable Scripts)
+
+To make the Paramiko script more reusable and avoid modifying it every time we need to add or remove commands or devices—which could lead to mistakes when editing the script directly—we can make the script more flexible by using external files.
+
+Instead of changing the script itself, users will simply update text files when they want to add or remove devices or commands.
+
+For example, we can create a file called `commands.txt` to store the commands. In this case, the commands will apply configuration changes to adjust the logging buffer size to 30,000 bytes.
+
+### Commands File (`commands.txt`)
+```text
+config t
+logging buffered 30000
+end
+copy run start
+```
+
+The device information is stored in JSON format in a file named `devices.json. JSON was chosen because its data types can be easily converted into Python dictionary data types.
+
+### Devices File (`devices.json`)
+```json
+{
+    "lax-edg-r1": {
+        "ip": "192.168.2.51"
+    },
+    "lax-edg-r2": {
+        "ip": "192.168.2.52"
+    }
+}
+```
+
+### Loading Files in Python
+```python
+with open('devices.json', 'r') as f:
+    devices = json.load(f)
+
+with open('commands.txt', 'r') as f:
+    commands = f.readlines()
+```
+- `devices.json` - we are loading the devices.json file, we are going to open the ‘devices.json’ file in read mode (‘r’), and this ‘with’ statement automatically  close the file when it’s done.
+
+The “json.load(f)” will read the JSON file and parses it into a Python object (usually a ‘dict’ or a ‘list’)..
+
+- `commands.txt` - iwe are going to read all lines from the commands.txt file and add it into a ‘list’. where each list element is one line of text (including the \n newline character). 
+
+### Full Script
+```python
+#!/usr/bin/env python
+
+import paramiko, getpass, time, json
+
+with open('devices.json', 'r') as f:
+    devices = json.load(f)
+
+with open('commands.txt', 'r') as f:
+    commands = f.readlines()
+
+username = input('Username: ')
+password = getpass.getpass('Password: ')
+
+max_buffer = 65535
+
+def clear_buffer(connection):
+    if connection.recv_ready():
+        return connection.recv(max_buffer)
+
+# Loop through devices
+for device in devices.keys():
+    outputFileName = device + '_output.txt'
+    connection = paramiko.SSHClient()
+    connection.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    connection.connect(devices[device]['ip'], username=username, password=password, look_for_keys=False, allow_agent=False)
+    new_connection = connection.invoke_shell()
+    output = clear_buffer(new_connection)
+    time.sleep(2)
+    new_connection.send("terminal length 0\n")
+    output = clear_buffer(new_connection)
+    with open(outputFileName, 'wb') as f:
+        for command in commands:
+            new_connection.send(command)
+            time.sleep(2)
+            output = new_connection.recv(max_buffer)
+            print(output)
+            f.write(output)
+
+    new_connection.close()
+```
+
+---
+
+## Key Takeaways
+- Use **private key authentication** for improved security.
+- Store commands and device info in **external files** to make scripts reusable and reduce risk of accidental changes.
+- Linux SSH sessions are more flexible than Cisco device sessions when using `exec_command()`.
+
