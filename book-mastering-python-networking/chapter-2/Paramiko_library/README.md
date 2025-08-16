@@ -415,12 +415,14 @@ ssh.close()
 ## First Paramiko Program Example (from book - file name: chapter2_3.py)
 
 ```python
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import paramiko, getpass, time
 
-devices = {'lax-edg-r1': {'ip': '192.168.2.51'},
-           'lax-edg-r2': {'ip': '192.168.2.52'}}
+devices = {'R1': {'ip': '10.10.20.171'},
+           'R2': {'ip': '10.10.20.172'}
+}
+
 commands = ['show version\n', 'show run\n']
 
 username = input('Username: ')
@@ -432,23 +434,25 @@ def clear_buffer(connection):
     if connection.recv_ready():
         return connection.recv(max_buffer)
 
+
 # Loop through devices
 for device in devices.keys():
-    outputFileName = device + '_output.txt'
+    outputFileName = device + '_show_run_output_txt'
     connection = paramiko.SSHClient()
     connection.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     connection.connect(devices[device]['ip'], username=username, password=password, look_for_keys=False, allow_agent=False)
     new_connection = connection.invoke_shell()
     output = clear_buffer(new_connection)
     time.sleep(5)
-    new_connection.send("terminal length 0\n")
-    output = clear_buffer(new_connection)
+    new_connection.send('enable\n')
+    new_connection.send(f'{password}\n')
+    new_connection.send('terminal length 0\n')
     with open(outputFileName, 'wb') as f:
         for command in commands:
             new_connection.send(command)
             time.sleep(5)
-            output = new_connection.recv(max_buffer)
-            print(output)
+            output = clear_buffer(new_connection)
+            print(output.decode())
             f.write(output)
 
     new_connection.close()
@@ -596,8 +600,6 @@ The “json.load(f)” will read the JSON file and parses it into a Python objec
 
 ### Full Script
 ```python
-#!/usr/bin/env python
-
 import paramiko, getpass, time, json
 
 with open('devices.json', 'r') as f:
@@ -605,6 +607,7 @@ with open('devices.json', 'r') as f:
 
 with open('commands.txt', 'r') as f:
     commands = f.readlines()
+
 
 username = input('Username: ')
 password = getpass.getpass('Password: ')
@@ -615,27 +618,73 @@ def clear_buffer(connection):
     if connection.recv_ready():
         return connection.recv(max_buffer)
 
+
 # Loop through devices
 for device in devices.keys():
-    outputFileName = device + '_output.txt'
+    outputFileName = f'{device}_configuration_output.txt'
     connection = paramiko.SSHClient()
     connection.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     connection.connect(devices[device]['ip'], username=username, password=password, look_for_keys=False, allow_agent=False)
     new_connection = connection.invoke_shell()
+    time.sleep(1)
+    new_connection.send('enable\n')
+    new_connection.send(f'{password}\n')
     output = clear_buffer(new_connection)
     time.sleep(2)
-    new_connection.send("terminal length 0\n")
-    output = clear_buffer(new_connection)
     with open(outputFileName, 'wb') as f:
         for command in commands:
-            new_connection.send(command)
-            time.sleep(2)
-            output = new_connection.recv(max_buffer)
-            print(output)
-            f.write(output)
+            if command == 'copy run start\n':
+                new_connection.send('copy run start\n')
+                new_connection.send(' \n')
+                time.sleep(3)
+            else:
+                new_connection.send(command)
+                time.sleep(1)
+                output = clear_buffer(new_connection)
+                print(output.decode())
+                f.write(output)
 
     new_connection.close()
 ```
+## Output
+
+```
+Username: cisco
+Password: 
+enable
+Password: 
+R1#config t
+Enter configuration commands, one per line.  End with CNTL/Z.
+R1(config)#
+logging buffered 30000
+R1(config)#
+end
+R1#
+copy run start
+Destination filename [startup-config]?  
+Building configuration...
+[OK]
+R1#show run | in logging buffered
+logging buffered 30000
+R1#
+enable
+Password: 
+R2#config t
+Enter configuration commands, one per line.  End with CNTL/Z.
+R2(config)#
+logging buffered 30000
+R2(config)#
+end
+R2#
+copy run start
+Destination filename [startup-config]?  
+Building configuration...
+[OK]
+R2#show run | in logging buffered
+logging buffered 30000
+R2#
+```
+
 
 ---
 
@@ -643,6 +692,7 @@ for device in devices.keys():
 - Use **private key authentication** for improved security.
 - Store commands and device info in **external files** to make scripts reusable and reduce risk of accidental changes.
 - Linux SSH sessions are more flexible than Cisco device sessions when using `exec_command()`.
+
 
 
 
