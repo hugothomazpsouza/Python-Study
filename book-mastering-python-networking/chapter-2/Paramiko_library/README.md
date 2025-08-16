@@ -76,6 +76,155 @@ R1#
 
 ```
 
+## Code Walkthrough - Python interactive mode 
+
+### 1. Import required libraries
+```python
+import paramiko
+import time
+```
+- `paramiko` → allows Python to connect to devices via SSH.  
+- `time` → often used for delays (e.g., `sleep`) when sending commands.
+
+---
+
+### 2. Create an SSH client
+```python
+connection = paramiko.SSHClient()
+```
+Creates an SSH client object called `connection`.  
+Think of it like opening the SSH program, but inside Python.
+
+---
+
+### 3. Set host key policy
+```python
+connection.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+```
+Normally SSH asks: *"Are you sure you want to continue connecting (yes/no)?"*  
+This line auto-accepts the host key without asking you.
+
+---
+
+### 4. Connect to the router
+```python
+connection.connect('10.10.20.171', username='cisco', password='cisco', look_for_keys=False, allow_agent=False)
+```
+- Connects to `10.10.20.171`  
+- Logs in with:
+  - **username:** `cisco`
+  - **password:** `cisco`  
+- `look_for_keys=False` → don’t use SSH keys.  
+- `allow_agent=False` → don’t use SSH agent.  
+
+✅ At this point, you are connected to the router.
+
+---
+
+### 5. Start interactive shell session
+```python
+new_connection = connection.invoke_shell()
+```
+Starts an interactive shell session (like typing commands directly on the router console).
+
+---
+
+### 6. Receive initial output
+```python
+output = new_connection.recv(5000)
+print(output)
+```
+- `recv(5000)` → receives up to 5000 bytes from the router.  
+- Output is in raw **bytes**, e.g.:  
+  ```
+  b'\r\n\r\nR1>'
+  ```
+
+---
+
+### 7. Decode output
+```python
+print(output.decode())
+```
+Converts bytes into human-readable text.  
+Output shows the router prompt:
+```
+R1>
+```
+
+---
+
+### 8. Enter enable mode
+```python
+new_connection.send('enable\n')
+```
+Sends the command `enable` (with Enter).  
+Router now asks for an **enable password**.
+
+---
+
+### 9. Read router’s reply
+```python
+output = new_connection.recv(5000)
+print(output.decode())
+```
+Expected reply:
+```
+enable
+Password:
+```
+
+---
+
+### 10. Send enable password
+```python
+new_connection.send('cisco\n')
+```
+
+---
+
+### 11. Confirm privileged mode
+```python
+output = new_connection.recv(5000)
+print(output.decode())
+```
+Reply may look like:
+```
+% Password:  timeout expired!
+Password:
+R1#
+```
+Even though it shows an error, the router accepted the password and switched to privileged exec mode (`R1#`).
+
+---
+
+### 12. Send show command
+```python
+new_connection.send('show version | i V\n')
+```
+Runs the command `show version | i V` → shows only lines with a capital **V**.
+
+---
+
+### 13. Read output
+```python
+output = new_connection.recv(5000)
+print(output.decode())
+```
+Sample output:
+```
+Cisco IOS Software [Dublin], Linux Software ...
+R1#
+```
+
+---
+
+### 14. Close connection
+```python
+new_connection.close()
+```
+Ends the interactive shell session.  
+Connection is now terminated.
 
 
 ```python
@@ -506,5 +655,6 @@ for device in devices.keys():
 - Use **private key authentication** for improved security.
 - Store commands and device info in **external files** to make scripts reusable and reduce risk of accidental changes.
 - Linux SSH sessions are more flexible than Cisco device sessions when using `exec_command()`.
+
 
 
