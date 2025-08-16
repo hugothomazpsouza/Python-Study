@@ -550,7 +550,7 @@ Because more and more network devices are adopting Linux shells with key-based a
 
 
 
-## More Paramiko Examples (Reusable Scripts)
+## More Paramiko Examples (Reusable Scripts - from book - file name: chapter2_4.py)
 
 To make the Paramiko script more reusable and avoid modifying it every time we need to add or remove commands or devices—which could lead to mistakes when editing the script directly—we can make the script more flexible by using external files.
 
@@ -643,6 +643,7 @@ for device in devices.keys():
 - Use **private key authentication** for improved security.
 - Store commands and device info in **external files** to make scripts reusable and reduce risk of accidental changes.
 - Linux SSH sessions are more flexible than Cisco device sessions when using `exec_command()`.
+
 
 
 
