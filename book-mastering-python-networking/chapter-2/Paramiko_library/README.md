@@ -268,8 +268,8 @@ print(output.decode())
 
 new_connection.close()
 ```
-
-```shell
+### Output of the show_vesion.py file 
+```
 (venv) host Paramiko_library % python3 show_version.py
 Username: cisco
 Password: 
@@ -714,6 +714,7 @@ for device in devices.keys():
 - Use **private key authentication** for improved security.
 - Store commands and device info in **external files** to make scripts reusable and reduce risk of accidental changes.
 - Linux SSH sessions are more flexible than Cisco device sessions when using `exec_command()`.
+
 
 
 
