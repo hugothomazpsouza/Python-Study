@@ -19,7 +19,65 @@ pip install paramiko
 
 ## Paramiko Overview
 
-### Example Script
+### Example Script in Interactive mode
+```python
+Python 3.9.6 (default, Apr 30 2025, 02:07:17) 
+[Clang 17.0.0 (clang-1700.0.13.5)] on darwin
+Type "help", "copyright", "credits" or "license" for more information.
+>>> 
+>>> 
+>>> import paramiko
+>>> import time
+>>> 
+>>> 
+>>> 
+>>> connection = paramiko.SSHClient()
+>>> connection.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+>>> connection.connect('10.10.20.171', username='cisco', password='cisco', look_for_keys=False, allow_agent=False)
+>>> 
+>>> new_connection = connection.invoke_shell()
+>>> output = new_connection.recv(5000)
+>>> print(output)
+b'\r\n\r\nR1>'
+>>> 
+>>> print(output.decode)
+<built-in method decode of bytes object at 0x101d69ed0>
+>>> print(output.decode())
+
+
+R1>
+>>> 
+>>> 
+>>> new_connection.send('enable\n')
+7
+>>> output = new_connection.recv(5000)
+>>> print(output.decode())
+enable
+Password: 
+>>> new_connection.send('cisco\n')
+6
+>>> output = new_connection.recv(5000)
+>>> print(output.decode())
+
+% Password:  timeout expired!
+Password: 
+R1#
+>>> 
+>>> 
+>>> new_connection.send('show version | i V\n')
+19
+>>> output = new_connection.recv(5000)
+>>> print(output.decode())
+show version | i V
+Cisco IOS Software [Dublin], Linux Software (X86_64BI_LINUX-ADVENTERPRISEK9-M), Version 17.12.1, RELEASE SOFTWARE (fc5)
+256K bytes of NVRAM.
+R1#
+>>> 
+
+```
+
+
+
 ```python
 import paramiko, time
 
@@ -448,4 +506,5 @@ for device in devices.keys():
 - Use **private key authentication** for improved security.
 - Store commands and device info in **external files** to make scripts reusable and reduce risk of accidental changes.
 - Linux SSH sessions are more flexible than Cisco device sessions when using `exec_command()`.
+
 
