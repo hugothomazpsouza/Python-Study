@@ -2,6 +2,13 @@
 
 Paramiko is a Python implementation of the SSHv2 protocol. It focuses only on SSHv2 with no Telnet support.
 
+## ✅ Creating a Virtual Environment
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+```
+
 ## Installation of Paramiko
 
 It’s pretty straightforward with Python pip. Due to the encryption used for the SSH protocol, there is a hard dependency on the `cryptography` library.
@@ -655,6 +662,7 @@ for device in devices.keys():
 - Use **private key authentication** for improved security.
 - Store commands and device info in **external files** to make scripts reusable and reduce risk of accidental changes.
 - Linux SSH sessions are more flexible than Cisco device sessions when using `exec_command()`.
+
 
 
 
