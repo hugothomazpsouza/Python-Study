@@ -286,127 +286,49 @@ Cisco IOS Software [Dublin], Linux Software (X86_64BI_LINUX-ADVENTERPRISEK9-M), 
 R1#
 ```
 
+## Another Example: `exec_command()` Success Case and force a Failed case
+
+
 ```python
-import paramiko, time
-
-connection = paramiko.SSHClient()
-connection.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-connection.connect(
-    '192.168.2.51',
-    username='cisco',
-    password='cisco',
-    look_for_keys=False,
-    allow_agent=False
-)
-new_connection = connection.invoke_shell()
-output = new_connection.recv(5000)
-print(output)
-
-stdin, stdout, stderr = connection.exec_command('show version | i V\n')
-
-time.sleep(3)
-output = new_connection.recv(5000)
-print(output)
-
-new_connection.close()
+Python 3.9.6 (default, Apr 30 2025, 02:07:17) 
+[Clang 17.0.0 (clang-1700.0.13.5)] on darwin
+Type "help", "copyright", "credits" or "license" for more information.
+>>> 
+>>> 
+>>> import paramiko
+>>> 
+>>> connection = paramiko.SSHClient()                                           >>> connection.set_missing_host_key_policy(paramiko.AutoAddPolicy())            >>> connection.connect('10.10.20.171', username='cisco', password='cisco', look_for_keys=False, allow_agent=False)
+>>> 
+>>> 
+>>> stdin, stdout, stderr = connection.exec_command('show arp\n')
+>>> stdout.read()
+b'\r\n\r\n\r\nProtocol  Address          Age (min)  Hardware Addr   Type   Interface\r\nInternet  1.1.1.1                 -   aabb.cc00.0310  ARPA   Ethernet0/1\r\nInternet  1.1.1.2               113   aabb.cc00.0410  ARPA   Ethernet0/1\r\nInternet  10.10.10.100            -   aabb.cc00.0300  ARPA   Ethernet0/0'
+>>> 
+>>> stdin, stdout, stderr = connection.exec_command('show arp\n')
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+  File "/Users/hugothomazpinheirodesouza/python-envs/book-mastering-python-networking/chapter-2/venv/lib/python3.9/site-packages/paramiko/client.py", line 558, in exec_command
+    chan = self._transport.open_session(timeout=timeout)
+  File "/Users/hugothomazpinheirodesouza/python-envs/book-mastering-python-networking/chapter-2/venv/lib/python3.9/site-packages/paramiko/transport.py", line 988, in open_session
+    return self.open_channel(
+  File "/Users/hugothomazpinheirodesouza/python-envs/book-mastering-python-networking/chapter-2/venv/lib/python3.9/site-packages/paramiko/transport.py", line 1082, in open_channel
+    raise SSHException("SSH session not active")
+paramiko.ssh_exception.SSHException: SSH session not active
+>>> 
 ```
-
-**Example Output:**
-```
-*************************************************************************
-* IOSv is strictly limited to use for evaluation, demonstration and     *
-* education. IOSv is provided as-is and is not supported by Cisco's     *
-* Technical Advisory Center. Any use or disclosure, in whole or in      *
-* part, of the IOSv Software or Documentation to any third party for    *
-* any purposes is expressly prohibited except as otherwise authorized   *
-* by Cisco in writing.                                                  *
-*************************************************************************
-lax-edg-r1#
-show version | i V
-Cisco IOS Software, IOSv Software (VIOS-ADVENTERPRISEK9-M), Version 15.8(3)M2, RELEASE SOFTWARE (fc2)
-Processor board ID 98U40DKV403INHIULHYHB
-lax-edg-r1#
-```
-
----
-
-## Code Breakdown
-
-### 1. `import paramiko`
-Imports the Paramiko library, used to make SSH connections to remote devices (Linux servers, Cisco routers, etc.).
-
-### 2. `connection = paramiko.SSHClient()`
-Creates an SSH client object called `connection`. It will be used to open the connection, run commands, and manage the session.
-
-### 3. `connection.set_missing_host_key_policy(paramiko.AutoAddPolicy())`
-By default, Paramiko won’t connect to unknown hosts (not found in `$HOME/.ssh/known_hosts`).  
-This tells Paramiko to automatically accept the host key for unknown devices instead of throwing an error.
-
-### 4. `connection.connect(...)`
-Opens an SSH connection to the remote device.
-
-**Arguments:**
-- `'192.168.2.51'` → IP address of the remote device
-- `username='cisco'` → SSH username
-- `password='cisco'` → SSH password
-- `look_for_keys=False` → Don’t use local SSH keys
-- `allow_agent=False` → Don’t use the SSH agent
-
-These last two ensure only the provided username/password are used.
-
-### 5. `new_connection = connection.invoke_shell()`
-Starts an **interactive shell session** with the remote device (like when you SSH manually).
-
-### 6. `output = new_connection.recv(5000)`
-Receives data from the shell (up to 5000 bytes).  
-This **reads and clears** the buffer to avoid mixing outputs between commands.
-
-### 7. `print(output)`
-Prints the received data (usually as a byte string `b'...'`).
-
-### 8. `new_connection.send("show version | i V\n")`
-Sends the CLI command `show version | include V`.  
-The `\n` simulates pressing **Enter**.
-
-### 9. `time.sleep(3)`
-Waits 3 seconds to allow the device to respond.
-
-### 10. `output = new_connection.recv(5000)`
-Reads the command output from the buffer.
-
-### 11. `print(output)`
-Displays the captured output.
-
-### 12. `new_connection.close()`
-Closes the interactive shell session.
-
----
-
-**Summary:**  
-This example demonstrates how to connect to a Cisco router using Paramiko, send commands, receive outputs, and handle session management in Python.
-
-
----
-
-## Another Example: `exec_command()` Success Case
 
 ### Code:
 ```python
 connection.connect('192.168.2.51', username='cisco', password='cisco',
                    look_for_keys=False, allow_agent=False)
-stdin, stdout, stderr = connection.exec_command('show version | i V\n')
+stdin, stdout, stderr = connection.exec_command('show arp\n')
 stdout.read()
 ```
 
 ### Explanation:
 1. **connection.connect(...)** → Connects to a Cisco router using SSH.
-2. **exec_command('show version | i V\n')** → Sends the command to the router in a new SSH session channel.
+2. **exec_command('show arp\n')** → Sends the command to the router in a new SSH session channel.
 3. **stdout.read()** → Reads the output of that command.
-
-**Sample Output:**
-```
-Cisco IOS Software, IOSv Software (VIOS-ADVENTERPRISEK9-M), Version 15.8(3)M2, ...
-```
 
 ---
 
@@ -414,10 +336,17 @@ Cisco IOS Software, IOSv Software (VIOS-ADVENTERPRISEK9-M), Version 15.8(3)M2, .
 
 ### Example Error:
 ```python
-stdin, stdout, stderr = connection.exec_command('show version | i V\n')
+>>> stdin, stdout, stderr = connection.exec_command('show arp\n')
 Traceback (most recent call last):
-...
+  File "<stdin>", line 1, in <module>
+  File "/Users/hugothomazpinheirodesouza/python-envs/book-mastering-python-networking/chapter-2/venv/lib/python3.9/site-packages/paramiko/client.py", line 558, in exec_command
+    chan = self._transport.open_session(timeout=timeout)
+  File "/Users/hugothomazpinheirodesouza/python-envs/book-mastering-python-networking/chapter-2/venv/lib/python3.9/site-packages/paramiko/transport.py", line 988, in open_session
+    return self.open_channel(
+  File "/Users/hugothomazpinheirodesouza/python-envs/book-mastering-python-networking/chapter-2/venv/lib/python3.9/site-packages/paramiko/transport.py", line 1082, in open_channel
+    raise SSHException("SSH session not active")
 paramiko.ssh_exception.SSHException: SSH session not active
+>>> 
 ```
 
 **Why This Happens:**
@@ -714,6 +643,7 @@ for device in devices.keys():
 - Use **private key authentication** for improved security.
 - Store commands and device info in **external files** to make scripts reusable and reduce risk of accidental changes.
 - Linux SSH sessions are more flexible than Cisco device sessions when using `exec_command()`.
+
 
 
 
