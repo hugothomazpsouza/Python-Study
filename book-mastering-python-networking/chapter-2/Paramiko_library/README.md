@@ -26,7 +26,7 @@ pip install paramiko
 
 ## Paramiko Overview
 
-# Example Script in Interactive mode
+### Example Script in Interactive mode
 ```python
 Python 3.9.6 (default, Apr 30 2025, 02:07:17) 
 [Clang 17.0.0 (clang-1700.0.13.5)] on darwin
@@ -233,7 +233,7 @@ new_connection.close()
 Ends the interactive shell session.  
 Connection is now terminated.
 
-# Example Script through Python file (show_vesion.py file)
+### Example Script through Python file (show_vesion.py file)
 
 ```python
 #!/usr/bin/env python3
@@ -714,6 +714,7 @@ for device in devices.keys():
 - Use **private key authentication** for improved security.
 - Store commands and device info in **external files** to make scripts reusable and reduce risk of accidental changes.
 - Linux SSH sessions are more flexible than Cisco device sessions when using `exec_command()`.
+
 
 
 
