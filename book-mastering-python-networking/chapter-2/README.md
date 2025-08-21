@@ -1,164 +1,304 @@
-# Nornir Framework
+# Python Virtual Environment & Pexpect for Network Automation
 
-Nornir is an automation framework written in Python to be used with Python.  
-It was not created to replace tools like **Netmiko** or **Napalm**, but rather designed to work with them.
+## 📦 Python Virtual Environment
 
----
+When working with Python virtual environments, we are creating *isolated environments* to separate package installations for different projects. This prevents conflicts between dependencies and avoids breaking other environments.
 
-## Installation
-
-Install Nornir and required plugins:
+### ✅ Creating a Virtual Environment
 
 ```bash
-pip install nornir nornir_utils nornir_netmiko
+python3 -m venv .venv
+source .venv/bin/activate
 ```
+
+### ❌ Deactivating the Virtual Environment
+
+```bash
+(.venv)$ deactivate
+```
+
+For more information:\
+👉 [Python Packaging: Installing with pip and virtual environments](https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/)
 
 ---
 
-## Inventory Setup
+## 🐍 Python Pexpect Library
 
-Nornir expects an inventory file (`hosts.yaml`) in **YAML format**.
+The `pexpect` library is useful when starting out with Python for network automation. It simulates human-like interactions with terminal-based programs, such as routers or switches.
 
-### Example `hosts.yaml`:
+### Example:
 
-```yaml
-R1:
-    hostname: '10.10.20.171'
-    port: 22
-    username: 'cisco'
-    password: 'cisco'
-    platform: 'cisco_ios'
+- Connect to a router
+- Expect the prompt: `Username:`
+- Send the username
+- Expect the prompt: `Password:`
+- Send the password
+- Then proceed with commands like `enable`, `configure terminal`, etc.
 
-R2:
-    hostname: '10.10.20.172'
-    port: 22
-    username: 'cisco'
-    password: 'cisco'
-    platform: 'cisco_ios'
-```
+This line-by-line interaction mimics what a human would do manually.
 
 ---
 
-## Example: Running a Command
+## 🔧 Pexpect Installation
 
-### Script (`chapter2_5.py`):
+To install `pexpect` in your virtual environment:
+
+```bash
+(.venv)$ pip install pexpect
+```
+
+> **Note:** `pip` is the standard Python package manager used to install and update packages within a virtual environment.
+
+---
+
+## 🛠️ Key Pexpect Methods
+
+### `expect()`
+
+This method waits for specific output from the terminal (e.g., a prompt or string). When the expected text (or pattern) appears, the script continues.
+
+**Example:**
 
 ```python
-#!/usr/bin/env python3
-
-from nornir import InitNornir
-from nornir_utils.plugins.functions import print_result
-from nornir_netmiko import netmiko_send_command
-
-nr = InitNornir()
-
-result = nr.run(
-    task=netmiko_send_command,
-    command_string="show arp"
-)
-
-print_result(result)
+child.expect("Username:")
 ```
 
-### Output:
+Means: *"Wait until the program prints 'Username:'"*
 
-```
-* R1 ** changed : False ********************************************************
-Protocol  Address          Age (min)  Hardware Addr   Type   Interface
-Internet  1.1.1.1                 -   aabb.cc00.0310  ARPA   Ethernet0/1
-Internet  1.1.1.2                27   aabb.cc00.0410  ARPA   Ethernet0/1
-Internet  10.10.10.100            -   aabb.cc00.0300  ARPA   Ethernet0/0
+**Tips:**
 
-* R2 ** changed : False ********************************************************
-Protocol  Address          Age (min)  Hardware Addr   Type   Interface
-Internet  1.1.1.1                27   aabb.cc00.0310  ARPA   Ethernet0/1
-Internet  1.1.1.2                 -   aabb.cc00.0410  ARPA   Ethernet0/1
-Internet  20.20.20.100            -   aabb.cc00.0400  ARPA   Ethernet0/0
-```
+- To match upper or lowercase: `child.expect('[Uu]sername')`
+- To match one of several options: `child.expect(['Username', 'username'])`
 
----
+### `sendline()`
 
-## Extra Exercise: Run Multiple Commands
+This method sends a string plus an ENTER keystroke to the terminal.
 
-Modify the script to collect **`show ip int brief`**, **`show version`**, and **`show arp`**.
-
-### Extended Inventory with Logging:
-
-```yaml
-R1:
-    hostname: '10.10.20.171'
-    port: 22
-    username: 'cisco'
-    password: 'cisco'
-    platform: 'cisco_ios'
-    connection_options:
-        netmiko:
-          extras:
-            secret: 'cisco'
-            session_log: logs/R1.log
-
-R2:
-    hostname: '10.10.20.172'
-    port: 22
-    username: 'cisco'
-    password: 'cisco'
-    platform: 'cisco_ios'
-    connection_options:
-        netmiko:
-          extras:
-            secret: 'cisco'
-            session_log: logs/R2.log
-```
-
-### Script (`run_multiple_show_commands.py`):
+**Example:**
 
 ```python
-#!/usr/bin/env python3
+child.sendline("admin")
+```
 
-from nornir import InitNornir
-from nornir_utils.plugins.functions import print_result
-from nornir_netmiko import netmiko_send_command
+Sends the string `admin` and presses ENTER.
 
-nr = InitNornir()
+---
 
-commands = ["show ip int brief", "show version", "show arp"]
+## 🔍 Understanding `child.before` and `child.after`
 
-for command in commands:
-    print(f'\n### Running {command} ###\n')
-    result = nr.run(
-        task=netmiko_send_command,
-        command_string=command,
-        enable=True
-    )
-    print_result(result)
+After calling `child.expect()`, two properties are often useful:
+
+- `child.before`: Contains everything printed **before** the .expect() match..
+- `child.after`: Contains exactly what was matched by .expect().
+
+### 💡 Golden Tip:
+
+Use `child.before` to get the output before the prompt, and `child.after` to confirm what was matched.
+
+### 📘 Example:
+
+```python
+import pexpect
+import sys
+
+devices = {'iosv-1': {'prompt': 'R1', 'ip': '10.10.20.171'}}
+
+username = 'cisco'
+password = 'cisco'
+
+for device in devices:
+    device_prompt = devices[device]['prompt']
+    child = pexpect.spawn('telnet ' + devices[device]['ip'])
+    child.expect('Username:')
+    child.sendline(username)
+    child.expect('Password:')
+    child.sendline(password)
+    child.expect(device_prompt + '>')
+    child.sendline('enable')
+    child.expect('Password:')
+    child.sendline(password)
+    child.expect(device_prompt + '#')
+    child.sendline('show version | i V')
+    child.expect(device_prompt + '#')
+    print(child.before)
+    child.sendline('exit')
+```
+
+### 📸 Output Example:
+
+```bash
+b'show version | i V\r\nCisco IOS Software ...'
 ```
 
 ---
 
-## Example Output (Truncated)
+## ❓ What does `b'...'` mean in Python?
 
+When you see `b'some text'`, it means the string is in **byte format** — not a regular text string.
+
+### 📌 Why does Pexpect return byte strings?
+
+Because it reads directly from the terminal, which returns data as raw **bytes**.
+
+### 🔀 How to convert to normal string?
+
+Use `.decode()`:
+
+```python
+output = child.before.decode()
+print(output)
 ```
-### Running show ip int brief ###
-Interface              IP-Address      OK? Method Status                Protocol
-Ethernet0/0            10.10.10.100    YES TFTP   up                    up
-Ethernet0/1            1.1.1.1         YES TFTP   up                    up
 
-### Running show version ###
-Cisco IOS Software [Dublin], Linux Software (X86_64BI_LINUX-ADVENTERPRISEK9-M), Version 17.12.1
+| Example            | Type    | Meaning                           |
+| ------------------ | ------- | --------------------------------- |
+| `'text'`           | `str`   | Standard text string              |
+| `b'text'`          | `bytes` | Byte string (raw binary)          |
+| `b'text'.decode()` | `str`   | Converts bytes to readable string |
 
-### Running show arp ###
-Protocol  Address          Age (min)  Hardware Addr   Type   Interface
-Internet  1.1.1.1                 -   aabb.cc00.0310  ARPA   Ethernet0/1
-Internet  1.1.1.2                45   aabb.cc00.0410  ARPA   Ethernet0/1
+---
+
+## ⏱️ Controlling Timeouts
+
+If your connection is slow or fast, you can set a custom timeout for `expect()`:
+
+```python
+child.expect('Username:', timeout=5)
 ```
 
 ---
 
-## Extra Information
+## 👨‍💻 Take Control of the Session with `interact()`
 
-For more information about the Nornir framework, check out this excellent post by **Syed Asif**:  
-🔗 [Getting Started with Nornir for Python Network Automation](https://medium.com/@sydasif78/getting-started-with-nornir-for-python-network-automation-6c23de5744af)
+If you want to run some commands automatically and then **take over manually**, use `child.interact()`:
 
-📄 A PDF copy of this article is included in this project:  
-**`Extra_information_Nornir_for_Python_Network_Automation_writed_by_Syed_Asif.pdf`**
+```python
+child.sendline('show ip int brief')
+child.expect('R1#')
+print(child.before.decode())
+child.interact()  # You now control the session manually
+```
 
+---
+
+## 📁 Logging the Session
+
+To log all session activity to a file:
+
+```python
+child.logfile = open('debug', 'wb')
+```
+
+Or to print all interaction to the terminal in real time:
+
+```python
+import sys
+child.logfile = sys.stdout.buffer
+```
+
+---
+
+## 🔐 SSH with `pxssh`
+
+`pexpect` has a subclass called `pxssh`, used for SSH sessions. It works similarly to Telnet, with some improvements.
+
+```python
+from pexpect import pxssh
+import sys
+
+child = pxssh.pxssh()
+child.login('10.10.20.175', 'cisco', 'cisco', auto_prompt_reset=False)
+child.logfile = sys.stdout.buffer
+
+child.expect('R1>')
+child.sendline('enable')
+child.expect('R1#')
+
+child.sendline('show ip int brief')
+child.expect('R1#')
+print(child.before.decode())
+child.logout()
+```
+
+### ℹ️ `auto_prompt_reset=False`
+
+- Tells `pxssh` **not** to try to change the prompt (e.g., `export PS1`) — important for routers/switches.
+- Useful for devices with known prompts like `R1>` or `R1#`.
+
+---
+
+## 📘 Full Script Example: Telnet Automation to Cisco Devices
+
+```python
+#!/usr/bin/env python
+
+import getpass
+import pexpect
+import sys
+
+devices = {
+    'iosv-1': {'prompt': 'R1', 'ip': '10.10.20.171'},
+    'iosv-2': {'prompt': 'R2', 'ip': '10.10.20.172'}
+}
+
+commands = ['term length 0', 'show version', 'show run']
+
+username = input('Username: ')
+password = getpass.getpass('Password: ')
+
+for device in devices:
+    outputFileName = device + '_output.txt'
+    device_prompt = devices[device]['prompt']
+    child = pexpect.spawn('telnet ' + devices[device]['ip'])
+    child.logfile = sys.stdout.buffer
+
+    child.expect('Username:')
+    child.sendline(username)
+    child.expect('Password:')
+    child.sendline(password)
+    child.expect(device_prompt + '>')
+
+    child.sendline('enable')
+    child.expect('Password:')
+    child.sendline(password)
+    child.expect(device_prompt + '#')
+
+    with open(outputFileName, 'wb') as f:
+        for command in commands:
+            child.sendline(command)
+            child.expect(device_prompt + '#')
+            f.write(child.before)
+
+    child.sendline('exit')
+```
+
+### 🔍 What this script does:
+
+1. Prompts for username and password.
+2. Loops over the device list.
+3. Connects via Telnet.
+4. Logs in and enters enable mode.
+5. Executes a list of commands.
+6. Saves output to `<device>_output.txt`.
+7. Closes the connection.
+
+### 🧪 Commands Used:
+
+```python
+['term length 0', 'show version', 'show run']
+```
+
+- `term length 0`: Disables `--More--` paging.
+- `show version`: Shows OS and version info.
+- `show run`: Shows full device configuration.
+
+### 📀 Output Files:
+
+- `iosv-1_output.txt`
+- `iosv-2_output.txt`
+
+### 📦 Required Libraries:
+
+- `pexpect`: Terminal automation
+- `getpass`: Secure password input
+- `sys`: Log to terminal
+ 
