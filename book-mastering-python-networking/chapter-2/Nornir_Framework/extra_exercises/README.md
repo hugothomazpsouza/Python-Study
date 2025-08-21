@@ -45,7 +45,7 @@ This repository contains extra and intermediate Nornir exercises for network aut
 ---
 
 ### Tips:
-Each assumes your hosts.yaml contains something like:
+- Each assumes your hosts.yaml contains something like:
 
 ````yaml
 R1:
@@ -74,7 +74,8 @@ R2:
 ```
 
 
-All scripts start with the same imports:
+- All scripts start with the same imports:
+
 ```python
 #!/usr/bin/env python3
 from nornir import InitNornir
