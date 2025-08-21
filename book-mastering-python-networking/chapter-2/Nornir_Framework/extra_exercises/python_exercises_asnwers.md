@@ -6,7 +6,7 @@ This repository provides answers to practical Python networking exercises using 
 
 ### Run multiple show commands (run_multiple_show_commands.py)
 
-````python
+```python
 #!/usr/bin/env python3
 
 from nornir import InitNornir
@@ -35,7 +35,7 @@ for command in commands:
 ## Intermediate Exercises
 
 ### 1. Check interface status across all devices(check_interface_status.py)
-````python
+```python
 #!/usr/bin/env python3
 
 from nornir import InitNornir
@@ -88,7 +88,7 @@ result = nr.run(task=ping_task)
 
 
 ### 3. Config push (push_configuration.py)
-````python
+```python
 #!/usr/bin/env python3
 
 from nornir import InitNornir
@@ -125,7 +125,7 @@ print_result(result)
 
 
 ### 4. Backup device configs (backup_configs.py)
-````python
+```python
 #!/usr/bin/env python3
 
 from nornir import InitNornir
